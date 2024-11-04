@@ -1,0 +1,215 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Funkcija koja stvara podniz
+int* podniz(int *niz, int start, int stop) {
+    if (start > stop || !niz) {
+        return NULL;
+    }
+
+    int duzina = stop - start + 1;
+    int *novi_niz = (int*)malloc(duzina * sizeof(int));
+    if (!novi_niz) {
+        perror("Neuspjela alokacija memorije");
+        exit(1);
+    }
+
+    for (int i = 0; i < duzina; i++) {
+        novi_niz[i] = niz[start + i];
+    }
+
+    return novi_niz;
+}
+
+// Funkcija koja filtrira niz prema zadanoj vrijednosti th
+int* filtriraj(int *niz, int n, int th, int *nth) {
+    int count = 0;
+
+    // Brojanje elemenata koji prolaze filter
+    for (int i = 0; i < n; i++) {
+        if (niz[i] < th) {
+            count++;
+        }
+    }
+
+    // Alociranje memorije za novi niz
+    int *novi_niz = (int*)malloc(count * sizeof(int));
+    if (!novi_niz) {
+        perror("Neuspjela alokacija memorije");
+        exit(1);
+    }
+
+    // Popunjavanje novog niza
+    int j = 0;
+    for (int i = 0; i < n; i++) {
+        if (niz[i] < th) {
+            novi_niz[j++] = niz[i];
+        }
+    }
+
+    *nth = count;
+    return novi_niz;
+}
+
+// Funkcija koja dijeli niz na dva dijela
+int** podijeli(int *niz, int n) {
+    if (n < 2 || !niz) {
+        return NULL;
+    }
+
+    int polovina = n / 2;
+
+    // Alokacija memorije za dva nova podniza
+    int *prvi = (int*)malloc(polovina * sizeof(int));
+    int *drugi = (int*)malloc((n - polovina) * sizeof(int));
+    if (!prvi || !drugi) {
+        perror("Neuspjela alokacija memorije");
+        exit(1);
+    }
+
+    // Popunjavanje prvog podniza
+    for (int i = 0; i < polovina; i++) {
+        prvi[i] = niz[i];
+    }
+
+    // Popunjavanje drugog podniza
+    for (int i = polovina; i < n; i++) {
+        drugi[i - polovina] = niz[i];
+    }
+
+    // Vraćanje pokazivača na podnizove
+    int **rezultat = (int**)malloc(2 * sizeof(int*));
+    rezultat[0] = prvi;
+    rezultat[1] = drugi;
+
+    return rezultat;
+}
+
+// Deklaracija strukture Tocka
+typedef struct {
+    float x;
+    float y;
+} Tocka;
+
+// Deklaracija strukture Poligon
+typedef struct {
+    Tocka *vrhovi;
+    int n;
+} Poligon;
+
+// Funkcija za stvaranje novog poligona
+Poligon* novi_poligon(float *niz_x, float *niz_y, int n) {
+    if (n < 3) {
+        return NULL;
+    }
+
+    Poligon *p = (Poligon*)malloc(sizeof(Poligon));
+    if (!p) {
+        perror("Neuspjela alokacija memorije");
+        exit(1);
+    }
+
+    p->vrhovi = (Tocka*)malloc(n * sizeof(Tocka));
+    if (!p->vrhovi) {
+        perror("Neuspjela alokacija memorije");
+        exit(1);
+    }
+
+    for (int i = 0; i < n; i++) {
+        p->vrhovi[i].x = niz_x[i];
+        p->vrhovi[i].y = niz_y[i];
+    }
+    p->n = n;
+
+    return p;
+}
+
+// Funkcija za izdvajanje pozitivnih vrhova poligona
+Tocka** pozitivni(Poligon *p, int *np) {
+    int count = 0;
+
+    // Brojanje vrhova s pozitivnim koordinatama
+    for (int i = 0; i < p->n; i++) {
+        if (p->vrhovi[i].x > 0 && p->vrhovi[i].y > 0) {
+            count++;
+        }
+    }
+
+    // Alokacija memorije za niz pokazivača na Tocka
+    Tocka **poz_vrhovi = (Tocka**)malloc(count * sizeof(Tocka*));
+    if (!poz_vrhovi) {
+        perror("Neuspjela alokacija memorije");
+        exit(1);
+    }
+
+    int j = 0;
+    for (int i = 0; i < p->n; i++) {
+        if (p->vrhovi[i].x > 0 && p->vrhovi[i].y > 0) {
+            poz_vrhovi[j++] = &p->vrhovi[i];
+        }
+    }
+
+    *np = count;
+    return poz_vrhovi;
+}
+
+// Main funkcija za testiranje
+int main() {
+    // Testiranje funkcije podniz
+    int niz[] = {1, 2, 3, 4, 5, 6};
+    int start = 2, stop = 4;
+    int *novi_niz = podniz(niz, start, stop);
+    printf("Podniz od indeksa %d do %d:\n", start, stop);
+    for (int i = 0; i <= stop - start; i++) {
+        printf("%d ", novi_niz[i]);
+    }
+    printf("\n");
+    free(novi_niz);
+
+    // Testiranje funkcije filtriraj
+    int n = 6;
+    int th = 4;
+    int nth;
+    int *filtrirani_niz = filtriraj(niz, n, th, &nth);
+    printf("Filtrirani niz (elementi manji od %d):\n", th);
+    for (int i = 0; i < nth; i++) {
+        printf("%d ", filtrirani_niz[i]);
+    }
+    printf("\n");
+    free(filtrirani_niz);
+
+    // Testiranje funkcije podijeli
+    int **podijeljeni_nizovi = podijeli(niz, n);
+    printf("Prvi dio niza:\n");
+    for (int i = 0; i < n / 2; i++) {
+        printf("%d ", podijeljeni_nizovi[0][i]);
+    }
+    printf("\nDrugi dio niza:\n");
+    for (int i = 0; i < (n - n / 2); i++) {
+        printf("%d ", podijeljeni_nizovi[1][i]);
+    }
+    printf("\n");
+    free(podijeljeni_nizovi[0]);
+    free(podijeljeni_nizovi[1]);
+    free(podijeljeni_nizovi);
+
+    // Testiranje funkcije novi_poligon i pozitivni
+    float niz_x[] = {1.5, -2.3, 3.0, 0.5};
+    float niz_y[] = {2.0, 4.1, -1.2, 3.5};
+    int broj_vrhova = 4;
+    Poligon *poligon = novi_poligon(niz_x, niz_y, broj_vrhova);
+    printf("Poligon kreiran s %d vrhova.\n", poligon->n);
+
+    int np;
+    Tocka **poz_vrhovi = pozitivni(poligon, &np);
+    printf("Pozitivni vrhovi (s obje koordinate pozitivne):\n");
+    for (int i = 0; i < np; i++) {
+        printf("Vrh %d: (%.2f, %.2f)\n", i + 1, poz_vrhovi[i]->x, poz_vrhovi[i]->y);
+    }
+
+    free(poligon->vrhovi);
+    free(poligon);
+    free(poz_vrhovi);
+
+    return 0;
+}

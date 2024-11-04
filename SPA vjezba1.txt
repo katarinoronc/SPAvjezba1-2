@@ -1,0 +1,133 @@
+#include <stdio.h>
+#include <string.h>
+
+int mystrlen(const char* str) {
+    int len = 0;
+    while(*str != '\0') {
+        str++;
+        len++;
+    }
+    return len;
+}
+
+char* mystrcpy(char* dest, const char* src) {
+    char* str = dest;
+    while(*src != '\0') {
+        *dest = *src;
+        dest++;
+        src++;
+    }
+    *dest = '\0';
+    return str;
+}
+
+int mystrcmp(const char* str1, const char* str2) {
+    int lval1 = 0, lval2 = 0;
+    while(*str1 != '\0') {
+        lval1 += (unsigned char)*str1;
+        str1++;
+    }
+    while(*str2 != '\0') {
+        lval2 += (unsigned char)*str2;
+        str2++;
+    }
+    return lval1 - lval2;
+}
+
+char* mystrcat(char* dest, const char* src) {
+    char* str = dest;
+    while(*dest != '\0') {
+        dest++;
+    }
+    while(*src != '\0') {
+        *dest = *src;
+        dest++;
+        src++;
+    }
+    *dest = '\0';
+    return str;
+}
+
+char* mystrstr(const char* haystack, const char* needle) {
+    if (!*needle) return (char*)haystack;
+    while (*haystack) {
+        const char* h = haystack;
+        const char* n = needle;
+        while (*h && *n && (*h == *n)) {
+            h++;
+            n++;
+        }
+        if (!*n) return (char*)haystack;
+        haystack++;
+    }
+    return NULL;
+}
+
+void reverse(const char* src, char* dest) {
+    const char* end = src + mystrlen(src) - 1;
+    while (end >= src) {
+        *dest++ = *end--;
+    }
+    *dest = '\0';
+}
+
+int main() {
+    
+    //mystrlen
+    printf("\nMYSTRLEN\n");
+    char str1[] = "dsadsafdsg gfsdgfdsg fsd gfsdgfds";
+    int rez1 = mystrlen(str1);
+    printf("Duzina stringa [%s] je: %d.\n", str1, rez1);
+    
+    //mystrcpy
+    printf("\nMYSTRCPY\n");
+    char str2a[100] = "Prvi string.";
+    char str2b[] = "Drugi string.";
+    printf("Prvi string je [%s].\nDrugi string je [%s].\n", str2a, str2b);
+    char* rez2 = mystrcpy(str2a, str2b);
+    printf("Kopija drugog stringa na prvi je [%s].\n", rez2);
+    
+    //mystrcmp
+    printf("\nMYSTRCMP\n");
+    char str3a[] = "aaaaa";
+    char str3b[] = "zzzzz";
+    int rez3 = mystrcmp(str3a, str3b);
+    printf("Rezultat razlike leksikografske vrijednosti je: %d.\n", rez3);
+    
+    //mystrcat
+    printf("\nMYSTRCAT\n");
+    char str4a[] = "Orginalni string";
+    char str4b[] = ", nadodani string.";
+    printf("Prvi string je [%s].\nDrugi string je [%s].\n", str4a, str4b);
+    char* rez4 = mystrcat(str4a, str4b);
+    printf("Kombinacija prvog i drugog stringa je [%s].\n", rez4);
+    
+    //mystrstr
+    printf("\nMYSTRSTR\n");   
+    /*
+    char str5a[] = "abcabbaan";
+    char str5b[] = "ba";
+    printf("Prvi string je [%s].\nDrugi string je [%s].\n", str5a, str5b);
+    char* rez51 = mystrcat(str5a, str5b);
+    printf("Kombinacija prvog i drugog stringa je [%s].\n", rez5a);
+    char str5c[] = "xxxabaaaaabaa";
+    char str5d[] = "aaab";
+    printf("Prvi string je [%s].\nDrugi string je [%s].\n", str5c, str5d);
+    char* rez5b = mystrcat(str4a, str4b);
+    printf("Kombinacija prvog i drugog stringa je [%s].\n", rez5b);
+    */
+    char haystack1[] = "abcabbaan";
+    char needle1[] = "ba";
+    printf("mystrstr (abcabbaan, ba): %s, strstr: %s\n", mystrstr(haystack1, needle1), strstr(haystack1, needle1));
+
+    char needle2[] = "xxx";
+    char haystack2[] = "aaabxxxabaaaaabaa";
+    printf("mystrstr (aaabxxxabaaaaabaa, xxx): %s, strstr: %s\n", mystrstr(haystack2, needle2), strstr(haystack2, needle2));
+    
+    printf("\nREVERSE\n");   
+    char str6a[] = "Obrnuti string.";
+    char str6b[100];
+    reverse(str6a, str6b);
+    printf("Obrnuti string je [%s].\n", str6b);
+
+}
